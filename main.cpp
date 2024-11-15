@@ -1,79 +1,85 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <iostream> // C++ 표준 입출력 사용
+#include <vector> // 벡터 사용을 위한 헤더 파일 포함
+#include <random> // 무작위 수 생성을 위한 헤더 파일 포함
+#include <numeric> // 총합 계산을 위한 유틸리티 함수 포함
+#include <cmath> // 수학 계산을 위한 헤더 파일 포함 (분산 및 표준편차 계산)
 
-#define HEADS 0
-#define TAILS 1
-#define NUM_FLIPS 10000
+#define NUM_VALUES 10 // 생성할 정수의 개수 정의
+#define RANGE_MIN 1 // 무작위 정수의 최소값 정의
+#define RANGE_MAX 100 // 무작위 정수의 최대값 정의
 
-// 시간 기반으로 난수 시드를 생성하는 함수
-void GenRandSeed()
+using namespace std;
+
+// 특정 범위 내에서 무작위 정수를 생성하는 함수
+int GenRandInt(int min, int max)
 {
-    srand((unsigned int)(time(NULL))); // 현재 시간을 사용하여 난수 시드 설정
+    random_device rd; // 실제 난수 생성 장치
+    mt19937 gen(rd()); // 난수 생성 엔진
+    uniform_int_distribution<> distr(min, max); // 균일 분포 정의
+    return distr(gen); // min과 max 사이의 무작위 정수 반환
 }
 
-// 동전을 무작위로 던지는 함수
-unsigned int CoinFlip()
+// 배열의 총합을 계산하는 함수
+int CalculateSum(const vector<int>& values)
 {
-    return rand() % 2; // 0 (앞면) 또는 1 (뒷면)을 반환
+    return accumulate(values.begin(), values.end(), 0); // 벡터 요소들을 모두 더하여 총합 계산
 }
 
-int main(void)
+// 배열의 평균을 계산하는 함수
+double CalculateMean(int sum, int size)
 {
-    char choice;
-    unsigned int result;
-    unsigned int headsCount = 0;
-    unsigned int tailsCount = 0;
+    return static_cast<double>(sum) / size; // 총합을 size로 나눠서 평균 계산
+}
 
-    // 난수 시드 초기화
-    GenRandSeed();
-
-    printf("동전 던지기 시뮬레이터에 오신 것을 환영합니다!\n");
-
-    while (1)
+// 배열의 분산을 계산하는 함수
+double CalculateVariance(const vector<int>& values, double mean)
+{
+    double variance = 0.0;
+    for (int value : values)
     {
-        // 사용자에게 동전을 10,000번 던질지 물어봄
-        printf("동전을 10,000번 던져 확률을 계산하시겠습니까? (예/아니오): ");
-        scanf(" %c", &choice);
-
-        if (choice == 'n' || choice == 'N')
-        {
-            printf("동전 던지기 시뮬레이터를 종료합니다. 안녕히 가세요!\n");
-            break;
-        }
-        else if (choice == 'y' || choice == 'Y')
-        {
-            // 동전을 10,000번 던짐
-            for (int i = 0; i < NUM_FLIPS; i++)
-            {
-                result = CoinFlip();
-                if (result == HEADS)
-                {
-                    headsCount++;
-                }
-                else
-                {
-                    tailsCount++;
-                }
-            }
-
-            // 확률을 계산하고 출력
-            double headsProbability = (double)headsCount / NUM_FLIPS * 100; // 앞면 확률 계산
-            double tailsProbability = (double)tailsCount / NUM_FLIPS * 100; // 뒷면 확률 계산
-
-            printf("앞면 횟수: %u, 뒷면 횟수: %u\n", headsCount, tailsCount);
-            printf("앞면 확률: %.2f%%\n", headsProbability);
-            printf("뒷면 확률: %.2f%%\n\n", tailsProbability);
-
-            // 다음 실행을 위해 카운트를 초기화
-            headsCount = 0;
-            tailsCount = 0;
-        }
-        else
-        {
-            printf("잘못된 입력입니다. 동전을 던지려면 '예'를, 종료하려면 '아니오'를 입력하세요.\n");
-        }
+        variance += (value - mean) * (value - mean); // 각 요소와 평균의 차의 제곱을 누적
     }
+    return variance / values.size(); // 분산 계산
+}
+
+// 배열의 표준편차를 계산하는 함수
+double CalculateStdDev(double variance)
+{
+    return sqrt(variance); // 분산의 제곱근을 구하여 표준편차 계산
+}
+
+int main()
+{
+    vector<int> values(NUM_VALUES); // 무작위로 생성된 정수를 저장할 벡터
+    int sum; // 총합을 저장할 변수
+    double mean, variance, stddev; // 평균, 분산, 표준편차를 저장할 변수들
+
+    // 정수 10개 무작위 생성 및 출력
+    cout << "무작위로 생성된 10개의 정수: ";
+    for (int i = 0; i < NUM_VALUES; i++)
+    {
+        values[i] = GenRandInt(RANGE_MIN, RANGE_MAX); // 무작위 정수 생성
+        cout << values[i] << " "; // 생성된 정수 출력
+    }
+    cout << endl;
+
+    // 총합 계산
+    sum = CalculateSum(values);
+
+    // 평균 계산
+    mean = CalculateMean(sum, NUM_VALUES);
+
+    // 분산 계산
+    variance = CalculateVariance(values, mean);
+
+    // 표준편차 계산
+    stddev = CalculateStdDev(variance);
+
+    // 결과 출력
+    cout << "총합: " << sum << endl;
+    cout << "평균: " << mean << endl;
+    cout << "분산: " << variance << endl;
+    cout << "표준편차: " << stddev << endl;
 
     return 0;
 }
