@@ -1,66 +1,49 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <iostream>
+#include <array>
 
-#define ARRAY_SIZE 10
-#define UNUSED -1
+using namespace std;
 
-//함수 선언
-void CalcEvenOddArray(int* arr, int size, int* evenArr, int* oddArrr, int* evenCount, int* oddCount);
-void PrintArray(int* arr, int size, const char* message);
+// 함수 선언
+array<double, 3> crossProduct(const array<double, 3>& vec1, const array<double, 3>& vec2);
+double dotProduct(const array<double, 3>& vec1, const array<double, 3>& vec2);
 
-int main()
-{
-	int arr[ARRAY_SIZE];
-	int evenArr[ARRAY_SIZE] = { UNUSED }; // 짝수 배열 초기화
-	int oddArr[ARRAY_SIZE] = { UNUSED }; // 홀수 배열 초기화
-	int evenCount = 0, oddCount = 0;
+int main() {
+    // 3차원 벡터 입력
+    array<double, 3> vec1, vec2;
 
-	srand(time(0)); //랜덤 시드 설정
+    cout << "첫 번째 벡터 (3차원)의 각 성분을 입력하세요 (예: x y z): ";
+    cin >> vec1[0] >> vec1[1] >> vec1[2];
 
-	// 배열에 랜덤 값 생성하기 (0 ~ 100 범위 정수)
-	for (int i = 0; i < ARRAY_SIZE; i++)
-	{
-		arr[i] = rand() % 101; // 0 ~ 100 범위 생성
-	}
+    cout << "두 번째 벡터 (3차원)의 각 성분을 입력하세요 (예: x y z): ";
+    cin >> vec2[0] >> vec2[1] >> vec2[2];
 
-	//랜덤 생성 상태 출력
-	PrintArray(arr, ARRAY_SIZE, "Initial Random Array");
-	{
-		//짝수 / 홀수 분리 처리
-		CalcEvenOddArray(arr, ARRAY_SIZE, evenArr, oddArr, &evenCount, &oddCount);
-		PrintArray(evenArr, evenCount, "Even Numbers Array");
-		PrintArray(oddArr, oddCount, "Odd Numners Array");
-	}
-	return 0;
+    // 내적 계산
+    double dot = dotProduct(vec1, vec2);
+    // 외적 계산
+    array<double, 3> cross = crossProduct(vec1, vec2);
+
+    // 결과 출력
+    cout << "\n내적 결과: " << dot << endl;
+    cout << "외적 결과: (" << cross[0] << ", " << cross[1] << ", " << cross[2] << ")" << endl;
+
+    return 0;
 }
-// 배열 짝수 / 홀수 분리 함수
-void CalcEvenOddArray(int* arr, int size, int* evenArr, int* oddArr, int* evenCount, int* oddCount)
-{
-	for (int i = 0; i < size; i++)
-	{
-		if (arr[i] % 2 == 0)
-		{
-			evenArr[*evenCount] = arr[i];
-			(*evenCount)++;
-		}
-		else
-		{
-			oddArr[*evenCount] = arr[i];
-			(*oddCount)++;
-		}
-	}
+
+// 내적 계산 함수
+double dotProduct(const array<double, 3>& vec1, const array<double, 3>& vec2) {
+    // 두 벡터의 내적 공식: vec1[0]*vec2[0] + vec1[1]*vec2[1] + vec1[2]*vec2[2]
+    return vec1[0] * vec2[0] + vec1[1] * vec2[1] + vec1[2] * vec2[2];
 }
-// 배열 출력 함수
-void PrintArray(int* arr, int size, const char* message)
-{
-	printf("%s:\n", message);
-	for (int i = 0; i < size; i++)
-	{
-		if (arr[i] != UNUSED)
-		{
-			printf("%d", arr[i]);
-		}
-	}
-	printf("\n\n");
+
+// 외적 계산 함수
+array<double, 3> crossProduct(const array<double, 3>& vec1, const array<double, 3>& vec2) {
+    array<double, 3> result;
+    // 외적 계산 공식:
+    // x = vec1[1]*vec2[2] - vec1[2]*vec2[1]
+    // y = vec1[2]*vec2[0] - vec1[0]*vec2[2]
+    // z = vec1[0]*vec2[1] - vec1[1]*vec2[0]
+    result[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
+    result[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
+    result[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
+    return result;
 }
