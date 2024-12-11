@@ -1,66 +1,38 @@
-#include <iostream>
-#include <vector>
-#include <random>
-#include <cmath>
+#include <stdio.h>
+#include <string.h>
 
-using namespace std;
-
-int main() 
+// 단어를 뒤집는 함수
+void reverse_word(char* start, char* end)
 {
-    vector<int> numbers(100);
-    vector<int> extracted;
-    int lower, upper, rangeStart, rangeEnd;
-
-    // 난수 범위 입력
-    cout << "무작위 정수를 생성할 범위를 입력하세요 (예: 최소 최대): ";
-    cin >> lower >> upper;
-
-    // 난수 생성
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dist(lower, upper);
-
-    for (int& num : numbers) 
+    while (start < end)
     {
-        num = dist(gen);
+        char temp = *start;
+        *start++ = *end;
+        *end-- = temp;
     }
+}
 
-    cout << "\n생성된 100개의 난수: ";
-    for (const int& num : numbers) cout << num << " ";
-    cout << endl;
+int main() {
+    char input[100]; // 입력 문자열 저장
 
-    // 범위 지정하여 숫자 추출
-    cout << "\n추출할 범위를 입력하세요 (예: 시작 종료): ";
-    cin >> rangeStart >> rangeEnd;
+    // 문자열 입력
+    printf("문자열을 입력하세요: ");
+    fgets(input, sizeof(input), stdin);
 
-    for (const int& num : numbers) 
+    // '\n' 제거
+    input[strcspn(input, "\n")] = '\0';
+
+    char* start = input; // 단어 시작 위치
+    for (char* cur = input; ; cur++)
     {
-        if (num >= rangeStart && num <= rangeEnd && extracted.size() < 10) 
-        {
-            extracted.push_back(num);
+        if (*cur == ' ' || *cur == '\0') { // 공백 또는 문자열 끝
+            reverse_word(start, (*cur == '\0') ? cur - 1 : cur - 1);
+            if (*cur == '\0') break; // 문자열 끝이면 종료
+            start = cur + 1;         // 다음 단어로 이동
         }
     }
 
-    cout << "\n추출된 숫자: ";
-    for (const int& num : extracted) cout << num << " ";
-    cout << endl;
-
-    // 통계 계산
-    double sum = 0;
-    for (const int& num : extracted) sum += num;
-    double mean = sum / extracted.size();
-
-    double variance = 0;
-    for (const int& num : extracted) variance += pow(num - mean, 2);
-    variance /= extracted.size();
-
-    double standardDeviation = sqrt(variance);
-
     // 결과 출력
-    cout << "\n합: " << sum << endl;
-    cout << "평균: " << mean << endl;
-    cout << "분산: " << variance << endl;
-    cout << "표준편차: " << standardDeviation << endl;
-
+    printf("뒤집힌 결과: %s\n", input);
     return 0;
 }
